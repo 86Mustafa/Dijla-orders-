@@ -1,0 +1,1145 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0A6C6C">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="طلبيات دجلة">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>طلبيات دجلة</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html,body{margin:0}body{font-family:system-ui,sans-serif;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>
+/* Layout: sticky header with tabs; the order is a catalog sheet (one line per item, quantity in, cartons out); a sticky totals bar closes the sheet. */
+:root{
+  --font-display:'Cairo','IBM Plex Sans Arabic',Tahoma,sans-serif;
+  --font-body:'IBM Plex Sans Arabic','Cairo',Tahoma,system-ui,sans-serif;
+  --bg:#F2F6F7; --surface:#FFFFFF; --surface-2:#E8EFF1; --line:#D3DDE1;
+  --fg:#12262B; --muted:#586C73;
+  --accent:#0A6C6C; --accent-fg:#FFFFFF; --accent-soft:#D6EDEB;
+  --warn:#8F5600; --warn-soft:#FBEACB;
+  --bad:#B3261E; --bad-soft:#F8DDDA;
+  --shadow:0 1px 2px rgba(18,38,43,.06),0 4px 14px rgba(18,38,43,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D191C; --surface:#14252A; --surface-2:#1B3237; --line:#2A444A;
+    --fg:#E5EFF1; --muted:#92A8AE;
+    --accent:#4FC3BD; --accent-fg:#06201F; --accent-soft:#17403F;
+    --warn:#F0B35A; --warn-soft:#3A2A0E;
+    --bad:#F2918B; --bad-soft:#401B18;
+    --shadow:none; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D191C; --surface:#14252A; --surface-2:#1B3237; --line:#2A444A;
+  --fg:#E5EFF1; --muted:#92A8AE;
+  --accent:#4FC3BD; --accent-fg:#06201F; --accent-soft:#17403F;
+  --warn:#F0B35A; --warn-soft:#3A2A0E;
+  --bad:#F2918B; --bad-soft:#401B18;
+  --shadow:none; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15px;line-height:1.6;direction:rtl}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--surface)}
+.wrap{max-width:1000px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--font-display);margin:0;line-height:1.3;text-wrap:balance}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* header */
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:baseline;gap:12px;padding-block:12px 8px;flex-wrap:wrap}
+.brand h1{font-size:1.35rem;font-weight:700}
+.brand span{color:var(--muted);font-size:.85rem}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding-bottom:8px}
+.tab{border:0;background:transparent;padding:9px 6px;border-radius:8px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{background:var(--accent-soft);color:var(--accent)}
+.tab small{font-weight:500;opacity:.85}
+
+main{padding-block:16px 28px;display:flex;flex-direction:column;gap:14px}
+.view{display:flex;flex-direction:column;gap:14px}
+
+/* generic */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:var(--shadow)}
+.card h2{font-size:1.05rem;margin-bottom:10px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1 1 150px}
+.field>span{font-size:.8rem;color:var(--muted);font-weight:500}
+input[type=text],select{height:44px;padding:0 12px;border-radius:9px;border:1px solid var(--line);background:var(--bg);width:100%;min-width:0;font-size:16px}
+input[type=text]:focus,select:focus{border-color:var(--accent)}
+.btn{height:44px;padding:0 16px;border-radius:9px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:600;white-space:nowrap}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.sm{height:36px;padding:0 12px;font-size:.88rem}
+.btn.armed{background:var(--bad);border-color:var(--bad);color:#fff}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.muted{color:var(--muted)}
+.note{font-size:.85rem;color:var(--muted)}
+.banner{background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:.9rem}
+.empty{text-align:center;padding:26px 12px;color:var(--muted)}
+.empty .btn{margin-top:10px}
+
+/* chips */
+.chip{display:inline-flex;align-items:center;padding:1px 9px;border-radius:99px;font-size:.78rem;font-weight:500;background:var(--surface-2);color:var(--muted);border:1px solid transparent;white-space:nowrap}
+.chip.packed{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.chip.unpacked{background:transparent;border-color:var(--line);color:var(--muted)}
+
+/* order sheet */
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.filters .field{flex:1 1 130px}
+.check{display:flex;align-items:center;gap:8px;font-size:.9rem;min-height:44px}
+.check input{width:18px;height:18px;accent-color:var(--accent)}
+.lines-head,.line{display:grid;grid-template-columns:minmax(0,2.6fr) .9fr .9fr .9fr minmax(96px,1.1fr) minmax(88px,1fr);gap:10px;align-items:center}
+.lines-head{padding:8px 12px;font-size:.8rem;color:var(--muted);font-weight:600}
+.lines{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.line{padding:8px 12px;border-top:1px solid var(--line)}
+.line:first-child{border-top:0}
+.line.has-qty{background:var(--accent-soft)}
+.l-name{font-weight:600;min-width:0;overflow-wrap:anywhere}
+.l-tags{display:contents}
+.cell-per .unit,.mlabel{display:none}
+.qty,.sin{height:44px;width:100%;text-align:center;font-size:17px;font-weight:600;border-radius:9px;border:1px solid var(--line);background:var(--surface);font-variant-numeric:tabular-nums}
+.qty:focus,.sin:focus{border-color:var(--accent)}
+.l-ctn{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0}
+.l-ctn output{font-family:var(--font-display);font-size:1.3rem;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;line-height:1.2}
+.line.has-qty .l-ctn output{color:var(--accent)}
+.hint{font-size:.72rem;color:var(--warn);text-align:center;min-height:0}
+.cell-num{font-variant-numeric:tabular-nums}
+.cap-note{padding:10px 12px;font-size:.85rem;color:var(--muted);border-top:1px solid var(--line)}
+
+.sumgrid{display:grid;grid-template-columns:1.2fr .8fr .6fr .8fr .8fr;gap:8px;padding:6px 0;border-top:1px solid var(--line);font-variant-numeric:tabular-nums;font-size:.9rem}
+.sumgrid.head{border-top:0;color:var(--muted);font-size:.78rem;font-weight:600}
+details>summary{cursor:pointer;font-weight:600;font-family:var(--font-display)}
+details[open]>summary{margin-bottom:8px}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.actions .btn{flex:1 1 140px}
+
+.bar{position:sticky;bottom:0;z-index:15;display:grid;grid-template-columns:1.3fr 1.3fr .8fr;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));box-shadow:0 -4px 16px rgba(18,38,43,.1)}
+.stat{display:flex;flex-direction:column;min-width:0}
+.stat span{font-size:.75rem;color:var(--muted);font-weight:500}
+.stat b{font-family:var(--font-display);font-size:1.55rem;line-height:1.2;font-variant-numeric:tabular-nums}
+.stat.main b{color:var(--accent)}
+.stat small{font-size:.72rem;color:var(--warn)}
+
+/* items + saved */
+.irow,.srow{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid var(--line);flex-wrap:wrap}
+.irow:first-child,.srow:first-child{border-top:0}
+.i-main{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1 1 220px}
+.i-main b{overflow-wrap:anywhere}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.i-act{display:flex;gap:8px}
+.mapgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:10px}
+.badlist{margin:8px 0 0;padding:0;list-style:none;font-size:.85rem;color:var(--bad)}
+.badlist li{padding:2px 0}
+.sum-line{display:flex;gap:14px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.sum-line b{font-family:var(--font-display)}
+
+/* stock count */
+.tab small{display:block;font-size:.7rem;min-height:1.1em;font-weight:500}
+.brand .btn{margin-inline-start:auto}
+.shead,.sline{display:grid;grid-template-columns:minmax(0,2.4fr) minmax(76px,.8fr) minmax(76px,.8fr) minmax(150px,1.7fr);gap:10px;align-items:center}
+.shead{padding:8px 12px;font-size:.8rem;color:var(--muted);font-weight:600}
+.sline{padding:8px 12px;border-top:1px solid var(--line)}
+.sline:first-child{border-top:0}
+.sline.has-qty{background:var(--accent-soft)}
+.s-name{display:flex;flex-direction:column;gap:4px;min-width:0}
+.s-name b{overflow-wrap:anywhere}
+.s-res{display:flex;flex-direction:column;gap:2px;min-width:0;font-size:.88rem}
+.s-res .sold{color:var(--accent);font-size:.95rem}
+.chip.warn{background:var(--warn-soft);color:var(--warn);font-weight:600}
+#repCard,#histCard{scroll-margin-top:130px}
+.tbox{overflow-x:auto;margin-top:10px}
+.rt{width:100%;border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums}
+.rt th{font-size:.78rem;color:var(--muted);font-weight:600;text-align:right;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.rt td{padding:7px 8px;border-top:1px solid var(--line);vertical-align:top}
+.rt td.n{white-space:nowrap}
+.rt td.sold{font-weight:700;color:var(--accent)}
+.rt tr.bad td.sold{color:var(--warn)}
+
+/* toast + modal */
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(90px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:99px;font-size:.9rem;z-index:50;max-width:calc(100vw - 32px);pointer-events:none;opacity:0;transition:opacity .2s}
+.toast.on{opacity:1}
+.modal{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:16px}
+.modal .card{width:min(560px,100%)}
+.modal textarea{width:100%;height:220px;border-radius:9px;border:1px solid var(--line);background:var(--bg);padding:10px;font-size:14px;direction:rtl}
+
+@media (max-width:700px){
+  .lines-head{display:none}
+  .line{grid-template-columns:1fr 1fr;grid-template-areas:"name name" "tags tags" "qty ctn";gap:8px 12px;padding:12px}
+  .l-name{grid-area:name}
+  .l-tags{grid-area:tags;display:flex;flex-wrap:wrap;gap:6px}
+  .l-qty{grid-area:qty}
+  .l-ctn{grid-area:ctn;align-items:flex-start;padding-inline-start:4px}
+  .mlabel{display:block;font-size:.72rem;color:var(--muted);margin-bottom:2px}
+  .cell-type,.cell-per{background:var(--surface-2);color:var(--muted);border-radius:99px;padding:1px 9px;font-size:.78rem}
+  .cell-per .unit{display:inline}
+  .l-ctn output{font-size:1.5rem}
+  .sumgrid{grid-template-columns:1.2fr 1fr .7fr .8fr .8fr;font-size:.82rem}
+  .shead{display:none}
+  .sline{grid-template-columns:1fr 1fr;grid-template-areas:"name name" "c p" "res res";gap:8px 12px;padding:12px}
+  .s-name{grid-area:name}.s-c{grid-area:c}.s-p{grid-area:p}.s-res{grid-area:res}
+  .tab{padding:9px 2px;font-size:.86rem}
+  .bar{grid-template-columns:1fr 1fr .7fr}
+  .stat b{font-size:1.35rem}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app" dir="rtl" lang="ar">
+  <header class="top">
+    <div class="wrap">
+      <div class="brand"><h1>طلبيات دجلة</h1><span>الشراء من المعمل الرئيسي</span><button class="btn sm" id="installBtn" data-act="install" hidden>تثبيت التطبيق</button></div>
+      <nav class="tabs" role="tablist" aria-label="الأقسام">
+        <button class="tab" role="tab" id="tab-order" data-act="tab" data-id="order">الطلبية<small>&nbsp;</small></button>
+        <button class="tab" role="tab" id="tab-stock" data-act="tab" data-id="stock">الجرد<small>&nbsp;</small></button>
+        <button class="tab" role="tab" id="tab-items" data-act="tab" data-id="items">المواد<small id="cItems">&nbsp;</small></button>
+        <button class="tab" role="tab" id="tab-saved" data-act="tab" data-id="saved">المحفوظة<small id="cSaved">&nbsp;</small></button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="banner" id="warnStorage" hidden>تعذّر الحفظ التلقائي في هذا المتصفح. احفظ نسخة احتياطية من قسم المواد حتى لا تفقد بياناتك.</div>
+
+    <!-- ORDER -->
+    <section class="view" id="view-order" hidden>
+      <div class="card">
+        <h2>المذخر</h2>
+        <div class="row">
+          <label class="field" for="whSel"><span>اختر المذخر</span>
+            <select id="whSel"></select></label>
+          <button class="btn" data-act="addWh" id="addWh">مذخر جديد</button>
+          <button class="btn" data-act="renameWh" id="renameWh">تعديل الاسم</button>
+          <button class="btn" data-act="delWh" id="delWh" data-confirm="تأكيد الحذف">حذف</button>
+        </div>
+        <div class="row" id="whEditRow" hidden style="margin-top:10px">
+          <label class="field" for="whName"><span id="whNameLbl">اسم المذخر</span>
+            <input type="text" id="whName" autocomplete="off" maxlength="60"></label>
+          <button class="btn primary" data-act="saveWh">حفظ</button>
+          <button class="btn" data-act="cancelWh">إلغاء</button>
+        </div>
+      </div>
+
+      <div class="card empty" id="noWh" hidden>
+        <b>ابدأ بإضافة اسم المذخر</b>
+        <div class="note">كل مذخر له طلبية مستقلة تُحفظ تلقائياً.</div>
+        <button class="btn primary" data-act="addWh">إضافة مذخر</button>
+      </div>
+      <div class="card empty" id="noItems" hidden>
+        <b>لا توجد مواد بعد</b>
+        <div class="note">أضف المواد يدوياً أو ارفع ملف Excel من قسم المواد.</div>
+        <button class="btn primary" data-act="tab" data-id="items">الذهاب إلى المواد</button>
+      </div>
+
+      <div id="orderBody" class="view" hidden>
+        <div class="card">
+          <div class="filters">
+            <label class="field" for="q"><span>بحث عن مادة</span><input type="text" id="q" autocomplete="off" placeholder="اكتب جزءاً من الاسم"></label>
+            <label class="field" for="fType"><span>النوع</span><select id="fType"></select></label>
+            <label class="field" for="fPack"><span>التغليف</span>
+              <select id="fPack"><option value="">الكل</option><option value="1">مغلف</option><option value="0">غير مغلف</option></select></label>
+            <label class="check" for="onlyOrdered"><input type="checkbox" id="onlyOrdered"> المطلوب فقط</label>
+          </div>
+          <div class="note" id="shown" style="margin-top:6px"></div>
+        </div>
+
+        <div>
+          <div class="lines-head" aria-hidden="true">
+            <span>المادة</span><span>النوع</span><span>التغليف</span><span>قطع/كارتون</span><span>الكمية (قطعة)</span><span style="text-align:center">عدد الكراتين</span>
+          </div>
+          <div class="lines" id="lines"></div>
+        </div>
+
+        <details class="card" id="summary">
+          <summary>ملخص التجهيز حسب النوع والتغليف</summary>
+          <div id="sumBody"></div>
+        </details>
+
+        <div class="card">
+          <div class="actions">
+            <button class="btn primary" data-act="saveOrder">حفظ الطلبية</button>
+            <button class="btn" data-act="copyWa">نسخ للواتساب</button>
+            <button class="btn" data-act="xlsxOrder">تصدير Excel</button>
+            <button class="btn" data-act="clearDraft" data-confirm="تأكيد التفريغ">تفريغ الكميات</button>
+          </div>
+        </div>
+
+        <div class="bar" aria-live="polite">
+          <div class="stat main"><span>إجمالي الكراتين</span><b id="tCtn">0</b></div>
+          <div class="stat"><span>إجمالي القطع</span><b id="tQty">0</b><small id="tRound"></small></div>
+          <div class="stat"><span>المواد</span><b id="tCount">0</b></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STOCK -->
+    <section class="view" id="view-stock" hidden>
+      <div class="card">
+        <h2>جرد المخزون الحالي</h2>
+        <div class="note">أدخل الباقي عند المذخر الآن بالكراتين والقطع. المصروف = (الباقي في آخر جرد + المشتريات المحفوظة بعده) − الباقي الآن.</div>
+        <div class="row" style="margin-top:10px">
+          <label class="field" for="stWh"><span>المذخر</span><select id="stWh"></select></label>
+        </div>
+        <div class="note" id="stInfo" style="margin-top:8px"></div>
+      </div>
+
+      <div class="card empty" id="stNoWh" hidden>
+        <b>اختر مذخراً أولاً</b>
+        <div class="note">أضف المذخر من قسم الطلبية، ثم ارجع إلى الجرد.</div>
+        <button class="btn primary" data-act="tab" data-id="order">الذهاب إلى الطلبية</button>
+      </div>
+      <div class="card empty" id="stNoItems" hidden>
+        <b>لا توجد مواد بعد</b>
+        <button class="btn primary" data-act="tab" data-id="items">الذهاب إلى المواد</button>
+      </div>
+
+      <div id="stBody" class="view" hidden>
+        <div class="card">
+          <div class="filters">
+            <label class="field" for="q3"><span>بحث عن مادة</span><input type="text" id="q3" autocomplete="off" placeholder="اكتب جزءاً من الاسم"></label>
+            <label class="check" for="showAllStock"><input type="checkbox" id="showAllStock"> عرض كل المواد</label>
+          </div>
+          <div class="note" id="stShown" style="margin-top:6px"></div>
+        </div>
+        <div>
+          <div class="shead" aria-hidden="true"><span>المادة</span><span>كراتين</span><span>قطع</span><span>المتوقع والمصروف</span></div>
+          <div class="lines" id="stLines"></div>
+        </div>
+        <div class="card">
+          <div class="actions">
+            <button class="btn primary" data-act="saveCount">حفظ الجرد وحساب المصروف</button>
+            <button class="btn" data-act="clearStock" data-confirm="تأكيد التفريغ">تفريغ الحقول</button>
+          </div>
+        </div>
+        <div class="bar" aria-live="polite">
+          <div class="stat main"><span>الكراتين المصروفة</span><b id="sCtn">0</b></div>
+          <div class="stat"><span>قطع سائبة</span><b id="sLoose">0</b></div>
+          <div class="stat"><span>تم جرده</span><b id="sCount">0</b></div>
+        </div>
+      </div>
+
+      <div class="card" id="repCard" hidden></div>
+      <div class="card" id="histCard" hidden></div>
+    </section>
+
+    <!-- ITEMS -->
+    <section class="view" id="view-items" hidden>
+      <div class="card">
+        <h2 id="formTitle">إضافة مادة</h2>
+        <div class="row">
+          <label class="field" style="flex:2 1 220px" for="fName"><span>اسم المادة</span><input type="text" id="fName" autocomplete="off" maxlength="120"></label>
+          <label class="field" for="fTypeIn"><span>النوع</span><select id="fTypeIn"></select></label>
+          <label class="field" for="fPackIn"><span>التغليف</span>
+            <select id="fPackIn"><option value="0">غير مغلف</option><option value="1">مغلف</option></select></label>
+          <label class="field" style="flex:1 1 120px" for="fPer"><span>قطع في الكارتون</span><input type="text" id="fPer" inputmode="numeric" autocomplete="off"></label>
+          <button class="btn primary" data-act="saveItem" id="saveItem">إضافة</button>
+          <button class="btn" data-act="cancelEdit" id="cancelEdit" hidden>إلغاء</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>استيراد من Excel</h2>
+        <div class="note">ارفع ملف .xlsx أو .csv. يُقرأ أول صفحة، وأول صف يُعتبر عناوين الأعمدة.</div>
+        <div class="row" style="margin-top:10px">
+          <label class="field" for="impFile"><span>ملف المواد</span><input type="file" id="impFile" accept=".xlsx,.xls,.csv"></label>
+          <button class="btn" data-act="tmpl">تنزيل نموذج Excel</button>
+        </div>
+        <div id="impPanel" hidden style="margin-top:12px">
+          <b>مطابقة الأعمدة</b>
+          <div class="mapgrid">
+            <label class="field" for="mapName"><span>اسم المادة</span><select id="mapName"></select></label>
+            <label class="field" for="mapPer"><span>قطع في الكارتون</span><select id="mapPer"></select></label>
+            <label class="field" for="mapType"><span>النوع</span><select id="mapType"></select></label>
+            <label class="field" for="mapPack"><span>التغليف</span><select id="mapPack"></select></label>
+            <label class="field" for="defType"><span>نوع افتراضي عند غياب القيمة</span><select id="defType"></select></label>
+            <label class="field" for="defPack"><span>تغليف افتراضي عند غياب القيمة</span>
+              <select id="defPack"><option value="0">غير مغلف</option><option value="1">مغلف</option></select></label>
+          </div>
+          <div id="impSummary" class="sum-line" style="margin-top:12px"></div>
+          <ul class="badlist" id="impBad"></ul>
+          <div class="row" style="margin-top:12px">
+            <button class="btn primary" data-act="importGo" id="impGo">استيراد المواد</button>
+            <button class="btn" data-act="importCancel">إلغاء</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>قائمة المواد <span class="muted" id="itemsCount"></span></h2>
+        <div class="filters">
+          <label class="field" for="q2"><span>بحث</span><input type="text" id="q2" autocomplete="off"></label>
+          <label class="field" for="fType2"><span>النوع</span><select id="fType2"></select></label>
+        </div>
+        <div id="itemsList" style="margin-top:8px"></div>
+      </div>
+
+      <div class="card">
+        <h2>نسخة احتياطية</h2>
+        <div class="note">تشمل المواد والمذاخر والكميات والطلبيات المحفوظة. استخدمها قبل تغيير الجهاز أو مسح بيانات المتصفح.</div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn" data-act="bkExport">حفظ نسخة احتياطية</button>
+          <label class="field" for="bkFile"><span>استعادة من نسخة</span><input type="file" id="bkFile" accept=".json"></label>
+        </div>
+        <div id="restorePanel" hidden style="margin-top:10px">
+          <div class="note" id="restoreInfo"></div>
+          <div class="row" style="margin-top:8px">
+            <button class="btn primary" data-act="restoreGo" data-confirm="سيستبدل بياناتك الحالية، اضغط للتأكيد">استعادة</button>
+            <button class="btn" data-act="restoreCancel">إلغاء</button>
+          </div>
+        </div>
+        <div class="row" style="margin-top:14px">
+          <button class="btn" data-act="delAllItems" data-confirm="تأكيد حذف كل المواد">حذف كل المواد</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SAVED -->
+    <section class="view" id="view-saved" hidden>
+      <div class="card">
+        <h2>الطلبيات المحفوظة</h2>
+        <div id="savedList"></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status"></div>
+  <div class="modal" id="copyModal" hidden>
+    <div class="card">
+      <h2>انسخ النص</h2>
+      <div class="note" style="margin-bottom:8px">تعذّر النسخ التلقائي. النص محدد، اضغط عليه مطولاً أو استخدم نسخ.</div>
+      <textarea id="copyArea" readonly></textarea>
+      <div class="row" style="margin-top:10px"><button class="btn primary" data-act="closeCopy">إغلاق</button></div>
+    </div>
+  </div>
+</div>
+
+<script src="xlsx.full.min.js"></script>
+<script>
+(function(){
+'use strict';
+document.documentElement.setAttribute('dir','rtl');
+document.documentElement.setAttribute('lang','ar');
+
+var TYPES=['حبوب','شراب','كريم','مرهم','معلق','قطرة','معقم'];
+var KEY='dijla-orders-v1';
+var LIMIT=500;
+var S={items:[],warehouses:[],currentWh:null,drafts:{},saved:[],counts:[],stockDrafts:{}};
+var storageOk=true, saveT=null, whMode=null, editId=null, imp=null, pendingRestore=null, dl=null, view='order', stCtx=null, reportId=null, deferredInstall=null;
+
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function toLatin(s){return String(s==null?'':s).replace(/[٠-٩]/g,function(d){return d.charCodeAt(0)-0x0660;}).replace(/[۰-۹]/g,function(d){return d.charCodeAt(0)-0x06F0;});}
+function norm(s){return toLatin(s).toLowerCase().replace(/[ً-ٰٟـ]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/\s+/g,' ').trim();}
+function fmt(n){return Number(n).toLocaleString('en-US');}
+function uid(){return Math.random().toString(36).slice(2,9)+Date.now().toString(36);}
+function keyOf(name,packed){return norm(name)+'|'+(packed?1:0);}
+function fmtDate(ts){
+  try{return new Intl.DateTimeFormat('ar-IQ-u-nu-latn',{dateStyle:'medium',timeStyle:'short'}).format(new Date(ts));}
+  catch(e){return new Date(ts).toLocaleString();}
+}
+function dayStr(ts){var d=new Date(ts||Date.now());return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+
+/* ---------- storage ---------- */
+function load(){
+  try{
+    var r=localStorage.getItem(KEY);
+    if(r){
+      var o=JSON.parse(r);
+      if(o&&typeof o==='object'){
+        S.items=Array.isArray(o.items)?o.items:[];
+        S.warehouses=Array.isArray(o.warehouses)?o.warehouses:[];
+        S.currentWh=o.currentWh||null;
+        S.drafts=(o.drafts&&typeof o.drafts==='object')?o.drafts:{};
+        S.saved=Array.isArray(o.saved)?o.saved:[];
+        S.counts=Array.isArray(o.counts)?o.counts:[];
+        S.stockDrafts=(o.stockDrafts&&typeof o.stockDrafts==='object')?o.stockDrafts:{};
+      }
+    }
+  }catch(e){}
+  try{localStorage.setItem(KEY+':t','1');localStorage.removeItem(KEY+':t');}catch(e){storageOk=false;}
+  $('warnStorage').hidden=storageOk;
+}
+function persist(){
+  clearTimeout(saveT);
+  saveT=setTimeout(function(){
+    try{localStorage.setItem(KEY,JSON.stringify(S));}
+    catch(e){$('warnStorage').hidden=false;}
+  },250);
+}
+
+/* ---------- ui helpers ---------- */
+var toastT=null;
+function toast(msg){
+  var t=$('toast');t.textContent=msg;t.classList.add('on');
+  clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('on');},2600);
+}
+function typeOptions(withAll){
+  return (withAll?'<option value="">كل الأنواع</option>':'')+TYPES.map(function(t){return '<option value="'+t+'">'+t+'</option>';}).join('');
+}
+function chips(it){
+  return '<span class="chip">'+esc(it.type)+'</span><span class="chip '+(it.packed?'packed':'unpacked')+'">'+(it.packed?'مغلف':'غير مغلف')+'</span><span class="chip">'+fmt(it.per)+' قطعة/كارتون</span>';
+}
+function copyText(text){
+  function fallback(){
+    $('copyArea').value=text;$('copyModal').hidden=false;
+    $('copyArea').focus();$('copyArea').select();
+  }
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){toast('تم النسخ');},fallback);
+    }else fallback();
+  }catch(e){fallback();}
+}
+async function saveFile(name,data,mime){
+  if(dl){
+    try{await dl.save({filename:name,data:data});toast('تم تجهيز الملف');}
+    catch(e){if(e&&e.code==='declined')return;toast('تعذّر حفظ الملف في هذه الواجهة');}
+    return;
+  }
+  try{
+    var blob=new Blob([data],{type:mime});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(a.href);},4000);
+  }catch(e){toast('تعذّر حفظ الملف');}
+}
+
+/* ---------- calculations ---------- */
+function ctn(qty,per){return qty>0?Math.ceil(qty/per):0;}
+function mkLine(it,q){return {name:it.name,type:it.type,packed:!!it.packed,per:it.per,qty:q,ctn:ctn(q,it.per)};}
+function sortLines(a){
+  return a.sort(function(x,y){
+    var t=TYPES.indexOf(x.type)-TYPES.indexOf(y.type);if(t)return t;
+    if(x.packed!==y.packed)return x.packed?-1:1;
+    return x.name.localeCompare(y.name,'ar');
+  });
+}
+function curDraft(){return (S.currentWh&&S.drafts[S.currentWh])||{};}
+function curLines(){
+  var d=curDraft(),arr=[];
+  S.items.forEach(function(it){var q=d[it.id]|0;if(q>0)arr.push(mkLine(it,q));});
+  return sortLines(arr);
+}
+function totalsOf(lines){
+  var t={ctn:0,qty:0,rounded:0,count:lines.length};
+  lines.forEach(function(l){t.ctn+=l.ctn;t.qty+=l.qty;t.rounded+=l.ctn*l.per;});
+  return t;
+}
+function whName(){var w=S.warehouses.find(function(x){return x.id===S.currentWh;});return w?w.name:'';}
+
+/* ---------- warehouses ---------- */
+function renderWh(){
+  var sel=$('whSel');
+  sel.innerHTML=S.warehouses.length?S.warehouses.map(function(w){return '<option value="'+w.id+'">'+esc(w.name)+'</option>';}).join(''):'<option value="">لا يوجد مذخر</option>';
+  if(!S.warehouses.some(function(w){return w.id===S.currentWh;}))S.currentWh=S.warehouses.length?S.warehouses[0].id:null;
+  sel.value=S.currentWh||'';
+  var s2=$('stWh');s2.innerHTML=sel.innerHTML;s2.value=S.currentWh||'';
+  $('whEditRow').hidden=!whMode;
+  $('whNameLbl').textContent=whMode==='rename'?'الاسم الجديد':'اسم المذخر';
+  $('renameWh').disabled=!S.currentWh;$('delWh').disabled=!S.currentWh;
+}
+function openWhEdit(mode){
+  whMode=mode;renderWh();
+  $('whName').value=mode==='rename'?whName():'';
+  $('whName').focus();
+}
+
+/* ---------- order view ---------- */
+function filteredItems(){
+  var q=norm($('q').value),ft=$('fType').value,fp=$('fPack').value,only=$('onlyOrdered').checked,d=curDraft();
+  return S.items.filter(function(it){
+    return (!ft||it.type===ft)&&(!fp||(fp==='1')===it.packed)&&(!q||norm(it.name).indexOf(q)>-1)&&(!only||d[it.id]>0);
+  });
+}
+function lineHtml(it,q){
+  var c=ctn(q,it.per),rounded=q>0&&c*it.per!==q;
+  return '<div class="line'+(q>0?' has-qty':'')+'" data-id="'+it.id+'">'+
+    '<div class="l-name">'+esc(it.name)+'</div>'+
+    '<div class="l-tags"><span class="cell-type">'+esc(it.type)+'</span>'+
+    '<span class="chip cell-pack '+(it.packed?'packed':'unpacked')+'">'+(it.packed?'مغلف':'غير مغلف')+'</span>'+
+    '<span class="cell-per cell-num"><span class="num">'+fmt(it.per)+'</span><span class="unit"> قطعة/كارتون</span></span></div>'+
+    '<div class="l-qty"><span class="mlabel">الكمية (قطعة)</span><input class="qty" id="q-'+it.id+'" type="text" inputmode="numeric" autocomplete="off" aria-label="الكمية: '+esc(it.name)+'" value="'+(q>0?q:'')+'"></div>'+
+    '<div class="l-ctn"><span class="mlabel">عدد الكراتين</span><output>'+(q>0?fmt(c):'—')+'</output><small class="hint">'+(rounded?'تقريب إلى '+fmt(c*it.per)+' قطعة':'')+'</small></div>'+
+  '</div>';
+}
+function renderOrder(){
+  var ready=!!S.currentWh&&S.items.length>0;
+  $('noWh').hidden=!!S.currentWh;
+  $('noItems').hidden=!(S.currentWh&&!S.items.length);
+  $('orderBody').hidden=!ready;
+  if(!ready)return;
+  var d=curDraft(),list=filteredItems(),shown=list,more=0;
+  if(list.length>LIMIT){shown=list.slice(0,LIMIT);more=list.length-LIMIT;}
+  $('lines').innerHTML=shown.length?shown.map(function(it){return lineHtml(it,d[it.id]|0);}).join(''):'<div class="empty">لا توجد مواد مطابقة</div>';
+  if(more)$('lines').insertAdjacentHTML('beforeend','<div class="cap-note">تم عرض أول '+LIMIT+' مادة. استخدم البحث لإظهار الباقي ('+fmt(more)+' مادة).</div>');
+  $('shown').textContent='عرض '+fmt(shown.length)+' من '+fmt(S.items.length)+' مادة';
+  updateTotals();
+}
+function updateTotals(){
+  var lines=curLines(),t=totalsOf(lines);
+  $('tCtn').textContent=fmt(t.ctn);$('tQty').textContent=fmt(t.qty);$('tCount').textContent=fmt(t.count);
+  $('tRound').textContent=t.rounded!==t.qty?'بعد التقريب: '+fmt(t.rounded):'';
+  var g={};
+  lines.forEach(function(l){
+    var k=l.type+'|'+(l.packed?1:0);
+    g[k]=g[k]||{type:l.type,packed:l.packed,n:0,ctn:0,qty:0};
+    g[k].n++;g[k].ctn+=l.ctn;g[k].qty+=l.qty;
+  });
+  var rows=Object.keys(g).map(function(k){return g[k];}).sort(function(a,b){return TYPES.indexOf(a.type)-TYPES.indexOf(b.type)||(a.packed===b.packed?0:(a.packed?-1:1));});
+  $('sumBody').innerHTML=rows.length?
+    '<div class="sumgrid head"><span>النوع</span><span>التغليف</span><span>مواد</span><span>كراتين</span><span>قطع</span></div>'+
+    rows.map(function(r){return '<div class="sumgrid"><span>'+esc(r.type)+'</span><span>'+(r.packed?'مغلف':'غير مغلف')+'</span><span>'+fmt(r.n)+'</span><span><b>'+fmt(r.ctn)+'</b></span><span>'+fmt(r.qty)+'</span></div>';}).join(''):
+    '<div class="note">لم تُدخل أي كمية بعد.</div>';
+}
+function onQtyInput(inp){
+  var row=inp.closest('.line');if(!row||!S.currentWh)return;
+  var raw=inp.value,clean=toLatin(raw).replace(/\D/g,'').slice(0,7);
+  if(clean!==raw)inp.value=clean;
+  var q=clean?parseInt(clean,10):0,id=row.dataset.id;
+  var it=S.items.find(function(x){return x.id===id;});if(!it)return;
+  var d=S.drafts[S.currentWh]||(S.drafts[S.currentWh]={});
+  if(q>0)d[id]=q;else delete d[id];
+  var c=ctn(q,it.per);
+  row.classList.toggle('has-qty',q>0);
+  row.querySelector('output').textContent=q>0?fmt(c):'—';
+  row.querySelector('.hint').textContent=(q>0&&c*it.per!==q)?'تقريب إلى '+fmt(c*it.per)+' قطعة':'';
+  updateTotals();persist();
+}
+
+/* ---------- exports ---------- */
+function waText(meta,lines){
+  var t=totalsOf(lines),out=['طلبية شراء من المعمل الرئيسي','المذخر: '+meta.whName,'التاريخ: '+fmtDate(meta.ts),''];
+  var last=null;
+  lines.forEach(function(l){
+    if(l.type!==last){if(last!==null)out.push('');out.push('*'+l.type+'*');last=l.type;}
+    out.push('• '+l.name+' ('+(l.packed?'مغلف':'غير مغلف')+') — '+fmt(l.qty)+' قطعة / '+fmt(l.ctn)+' كارتون');
+  });
+  out.push('','إجمالي الكراتين: '+fmt(t.ctn),'إجمالي القطع: '+fmt(t.qty));
+  if(t.rounded!==t.qty)out.push('القطع بعد التقريب: '+fmt(t.rounded));
+  return out.join('\n');
+}
+function buildOrderXlsx(meta,lines){
+  var t=totalsOf(lines);
+  var aoa=[['المذخر',meta.whName],['التاريخ',fmtDate(meta.ts)],[],['#','المادة','النوع','التغليف','قطع/كارتون','الكمية (قطعة)','عدد الكراتين']];
+  lines.forEach(function(l,i){aoa.push([i+1,l.name,l.type,l.packed?'مغلف':'غير مغلف',l.per,l.qty,l.ctn]);});
+  aoa.push([]);aoa.push(['','المجموع','','','',t.qty,t.ctn]);
+  if(t.rounded!==t.qty)aoa.push(['','القطع بعد التقريب','','','',t.rounded,'']);
+  var ws=XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols']=[{wch:5},{wch:34},{wch:10},{wch:12},{wch:12},{wch:14},{wch:14}];
+  var g={};
+  lines.forEach(function(l){var k=l.type+'|'+(l.packed?1:0);g[k]=g[k]||{type:l.type,packed:l.packed,n:0,ctn:0,qty:0};g[k].n++;g[k].ctn+=l.ctn;g[k].qty+=l.qty;});
+  var sum=[['النوع','التغليف','عدد المواد','الكراتين','القطع']];
+  Object.keys(g).map(function(k){return g[k];}).sort(function(a,b){return TYPES.indexOf(a.type)-TYPES.indexOf(b.type)||(a.packed===b.packed?0:(a.packed?-1:1));})
+    .forEach(function(r){sum.push([r.type,r.packed?'مغلف':'غير مغلف',r.n,r.ctn,r.qty]);});
+  var ws2=XLSX.utils.aoa_to_sheet(sum);ws2['!cols']=[{wch:12},{wch:12},{wch:12},{wch:12},{wch:12}];
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'الطلبية');XLSX.utils.book_append_sheet(wb,ws2,'ملخص');
+  wb.Workbook={Views:[{RTL:true}]};
+  return XLSX.write(wb,{bookType:'xlsx',type:'array'});
+}
+function exportOrder(meta,lines){
+  if(!lines.length){toast('الطلبية فارغة');return;}
+  if(typeof XLSX==='undefined'){toast('تعذّر تحميل مكتبة Excel، تحقق من الاتصال');return;}
+  var name='طلبية-'+meta.whName.slice(0,30)+'-'+dayStr(meta.ts)+'.xlsx';
+  saveFile(name,buildOrderXlsx(meta,lines),'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+}
+
+/* ---------- stock count ---------- */
+function sameWh(o,w){return !!w&&(o.whId===w.id||norm(o.whName)===norm(w.name));}
+function resolveWh(rec){
+  var w=S.warehouses.find(function(x){return x.id===rec.whId;})||S.warehouses.find(function(x){return norm(x.name)===norm(rec.whName);});
+  if(!w){w={id:uid(),name:rec.whName};S.warehouses.push(w);}
+  return w;
+}
+/* for each item: last counted remainder, and pieces bought (in whole cartons) after that count */
+function stockCtx(){
+  var w=S.warehouses.find(function(x){return x.id===S.currentWh;});
+  var ctx={w:w,lastFor:{},bought:{},known:{},last:null};
+  if(!w)return ctx;
+  S.counts.filter(function(c){return sameWh(c,w);}).sort(function(a,b){return a.ts-b.ts;}).forEach(function(c){
+    ctx.last=c;
+    c.lines.forEach(function(l){var k=keyOf(l.name,l.packed);ctx.lastFor[k]={rem:l.rem,ts:c.ts};ctx.known[k]=1;});
+  });
+  S.saved.filter(function(o){return sameWh(o,w);}).forEach(function(o){
+    o.lines.forEach(function(l){
+      var k=keyOf(l.name,l.packed),lf=ctx.lastFor[k];
+      ctx.known[k]=1;
+      if(!lf||o.ts>lf.ts)ctx.bought[k]=(ctx.bought[k]||0)+l.ctn*l.per;
+    });
+  });
+  return ctx;
+}
+function expectedOf(ctx,k){var lf=ctx.lastFor[k];return (lf?lf.rem:0)+(ctx.bought[k]||0);}
+function remOf(it,e){return (e.c||0)*it.per+(e.p||0);}
+function cp(n,per){
+  if(!(n>0))return '0';
+  var c=Math.floor(n/per),r=n%per,p=[];
+  if(c)p.push(fmt(c)+' كرتون');
+  if(r)p.push(fmt(r)+' قطعة');
+  return p.join(' و ');
+}
+function reportTotals(lines){
+  var t={pcs:0,ctn:0,loose:0,bad:0};
+  lines.forEach(function(l){
+    if(l.sold>0){t.pcs+=l.sold;t.ctn+=Math.floor(l.sold/l.per);t.loose+=l.sold%l.per;}
+    else if(l.sold<0)t.bad++;
+  });
+  return t;
+}
+function stockList(){
+  var q=norm($('q3').value),all=$('showAllStock').checked,d=S.stockDrafts[S.currentWh]||{};
+  return S.items.filter(function(it){
+    var k=keyOf(it.name,it.packed);
+    return (all||stCtx.known[k]||d[it.id])&&(!q||norm(it.name).indexOf(q)>-1);
+  }).sort(function(a,b){return TYPES.indexOf(a.type)-TYPES.indexOf(b.type)||(a.packed===b.packed?0:(a.packed?-1:1))||a.name.localeCompare(b.name,'ar');});
+}
+function resHtml(it,e){
+  var exp=expectedOf(stCtx,keyOf(it.name,it.packed));
+  var h='<span class="note">المتوقع: '+cp(exp,it.per)+'</span>';
+  if(e){
+    var sold=exp-remOf(it,e);
+    h+=sold>=0?'<b class="sold">المصروف: '+cp(sold,it.per)+'</b>':'<span class="chip warn">الباقي أكبر من المتوقع</span>';
+  }
+  return h;
+}
+function stLineHtml(it,e){
+  var lf=stCtx.lastFor[keyOf(it.name,it.packed)];
+  return '<div class="sline'+(e?' has-qty':'')+'" data-id="'+it.id+'">'+
+    '<div class="s-name"><b>'+esc(it.name)+'</b><div class="chips">'+chips(it)+(lf?'':'<span class="chip">جرد أول</span>')+'</div></div>'+
+    '<div class="s-c"><span class="mlabel">كراتين</span><input class="sin" data-k="c" id="sc-'+it.id+'" type="text" inputmode="numeric" autocomplete="off" aria-label="كراتين: '+esc(it.name)+'" value="'+(e&&e.c!=null?e.c:'')+'"></div>'+
+    '<div class="s-p"><span class="mlabel">قطع</span><input class="sin" data-k="p" id="sp-'+it.id+'" type="text" inputmode="numeric" autocomplete="off" aria-label="قطع: '+esc(it.name)+'" value="'+(e&&e.p!=null?e.p:'')+'"></div>'+
+    '<div class="s-res">'+resHtml(it,e)+'</div></div>';
+}
+function updateStockBar(){
+  var d=S.stockDrafts[S.currentWh]||{},n=0,ctn=0,loose=0;
+  S.items.forEach(function(it){
+    var e=d[it.id];if(!e)return;
+    n++;
+    var sold=expectedOf(stCtx,keyOf(it.name,it.packed))-remOf(it,e);
+    if(sold>0){ctn+=Math.floor(sold/it.per);loose+=sold%it.per;}
+  });
+  $('sCount').textContent=fmt(n);$('sCtn').textContent=fmt(ctn);$('sLoose').textContent=fmt(loose);
+}
+function renderStock(){
+  stCtx=stockCtx();
+  var has=!!S.currentWh,ready=has&&S.items.length>0;
+  $('stNoWh').hidden=has;$('stNoItems').hidden=!(has&&!S.items.length);$('stBody').hidden=!ready;
+  $('stInfo').textContent=!has?'':(stCtx.last?'آخر جرد لهذا المذخر: '+fmtDate(stCtx.last.ts)+'. المشتريات المحفوظة بعده تُضاف إلى المتوقع.':'لا يوجد جرد سابق لهذا المذخر. هذا الجرد يصبح نقطة البداية، وتظهر نتائج المصروف الدقيقة من الجرد الثاني.');
+  if(ready){
+    var list=stockList(),d=S.stockDrafts[S.currentWh]||{},shown=list.slice(0,LIMIT);
+    $('stLines').innerHTML=shown.length?shown.map(function(it){return stLineHtml(it,d[it.id]);}).join(''):'<div class="empty">'+(!$('showAllStock').checked&&!Object.keys(stCtx.known).length?'لا توجد مواد مشتراة من هذا المذخر بعد. احفظ طلبية أولاً، أو فعّل «عرض كل المواد».':'لا توجد مواد مطابقة')+'</div>';
+    $('stShown').textContent='عرض '+fmt(shown.length)+' من '+fmt(S.items.length)+' مادة';
+    updateStockBar();
+  }
+  renderReport();
+}
+function sortedCopy(lines){return sortLines(lines.slice());}
+function renderReport(){
+  var w=S.warehouses.find(function(x){return x.id===S.currentWh;});
+  var list=w?S.counts.filter(function(c){return sameWh(c,w);}).sort(function(a,b){return b.ts-a.ts;}):[];
+  var c=list.find(function(x){return x.id===reportId;})||list[0];
+  var card=$('repCard'),hist=$('histCard');
+  if(!c){card.hidden=true;hist.hidden=true;return;}
+  var t=reportTotals(c.lines);
+  var rows=sortedCopy(c.lines).map(function(l){
+    return '<tr class="'+(l.sold<0?'bad':'')+'"><td><b>'+esc(l.name)+'</b><div class="note">'+esc(l.type)+' · '+(l.packed?'مغلف':'غير مغلف')+(l.first?' · جرد أول':'')+'</div></td>'+
+      '<td class="n sold">'+(l.sold>=0?cp(l.sold,l.per):'راجع الجرد')+'</td>'+
+      '<td class="n">'+cp(l.rem,l.per)+'</td><td class="n">'+cp(l.bought,l.per)+'</td><td class="n">'+cp(l.prev,l.per)+'</td></tr>';
+  }).join('');
+  card.hidden=false;
+  card.innerHTML='<h2>مصروف '+esc(c.whName)+'</h2><div class="note">جرد '+esc(fmtDate(c.ts))+'</div>'+
+    '<div class="sum-line" style="margin-top:8px"><span>كراتين مصروفة: <b>'+fmt(t.ctn)+'</b></span><span>قطع سائبة: <b>'+fmt(t.loose)+'</b></span><span>إجمالي القطع: <b>'+fmt(t.pcs)+'</b></span></div>'+
+    (t.bad?'<div class="banner" style="margin-top:10px">'+fmt(t.bad)+' مادة الباقي فيها أكبر من المتوقع. راجع الجرد أو الطلبيات المحفوظة.</div>':'')+
+    '<div class="tbox"><table class="rt"><thead><tr><th>المادة</th><th>المصروف</th><th>الباقي الآن</th><th>المشتريات بعده</th><th>الباقي سابقاً</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+    '<div class="actions" style="margin-top:12px"><button class="btn primary" data-act="fillFromCount" data-id="'+c.id+'" data-confirm="سيستبدل كميات الطلبية، اضغط للتأكيد">تعبئة الطلبية بالمصروف</button>'+
+    '<button class="btn" data-act="xlsxCount" data-id="'+c.id+'">تصدير Excel</button></div>';
+  hist.hidden=false;
+  hist.innerHTML='<h2>سجل الجرد</h2>'+list.map(function(x){
+    var tt=reportTotals(x.lines);
+    return '<div class="srow"><div class="i-main"><b>'+esc(fmtDate(x.ts))+'</b><div class="sum-line"><span>مواد: <b>'+fmt(x.lines.length)+'</b></span><span>مصروف: <b>'+fmt(tt.ctn)+'</b> كرتون و <b>'+fmt(tt.loose)+'</b> قطعة</span></div></div>'+
+      '<div class="i-act"><button class="btn sm" data-act="showCount" data-id="'+x.id+'">عرض</button>'+
+      '<button class="btn sm" data-act="delCount" data-id="'+x.id+'" data-confirm="تأكيد الحذف">حذف</button></div></div>';
+  }).join('');
+}
+function onStockInput(inp){
+  var row=inp.closest('.sline');if(!row||!S.currentWh)return;
+  var clean=toLatin(inp.value).replace(/\D/g,'').slice(0,7);
+  if(clean!==inp.value)inp.value=clean;
+  var id=row.dataset.id,it=S.items.find(function(x){return x.id===id;});if(!it)return;
+  var cv=row.querySelector('[data-k="c"]').value,pv=row.querySelector('[data-k="p"]').value;
+  var dr=S.stockDrafts[S.currentWh]||(S.stockDrafts[S.currentWh]={});
+  if(cv===''&&pv==='')delete dr[id];
+  else dr[id]={c:cv===''?null:parseInt(cv,10),p:pv===''?null:parseInt(pv,10)};
+  row.classList.toggle('has-qty',!!dr[id]);
+  row.querySelector('.s-res').innerHTML=resHtml(it,dr[id]);
+  updateStockBar();persist();
+}
+function exportCount(c){
+  if(typeof XLSX==='undefined'){toast('تعذّر تحميل مكتبة Excel، تحقق من الاتصال');return;}
+  var t=reportTotals(c.lines),lines=sortedCopy(c.lines);
+  var aoa=[['المذخر',c.whName],['تاريخ الجرد',fmtDate(c.ts)],[],['#','المادة','النوع','التغليف','قطع/كارتون','الباقي سابقاً (قطعة)','المشتريات بعده (قطعة)','الباقي الآن (قطعة)','المصروف (قطعة)','المصروف (كراتين وقطع)']];
+  lines.forEach(function(l,i){aoa.push([i+1,l.name,l.type,l.packed?'مغلف':'غير مغلف',l.per,l.prev,l.bought,l.rem,l.sold,l.sold>=0?cp(l.sold,l.per):'راجع الجرد']);});
+  aoa.push([]);aoa.push(['','المجموع','','','','','','',t.pcs,fmt(t.ctn)+' كرتون و '+fmt(t.loose)+' قطعة']);
+  var ws=XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols']=[{wch:5},{wch:34},{wch:10},{wch:12},{wch:12},{wch:18},{wch:20},{wch:18},{wch:16},{wch:24}];
+  var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'المصروف');
+  wb.Workbook={Views:[{RTL:true}]};
+  saveFile('مصروف-'+c.whName.slice(0,30)+'-'+dayStr(c.ts)+'.xlsx',XLSX.write(wb,{bookType:'xlsx',type:'array'}),'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+}
+
+/* ---------- items ---------- */
+function renderItemForm(){
+  var it=editId&&S.items.find(function(x){return x.id===editId;});
+  if(editId&&!it)editId=null;
+  $('formTitle').textContent=it?'تعديل مادة':'إضافة مادة';
+  $('saveItem').textContent=it?'حفظ التعديل':'إضافة';
+  $('cancelEdit').hidden=!it;
+  if(it){$('fName').value=it.name;$('fTypeIn').value=it.type;$('fPackIn').value=it.packed?'1':'0';$('fPer').value=it.per;}
+}
+function renderItems(){
+  var q=norm($('q2').value),ft=$('fType2').value;
+  var list=S.items.filter(function(it){return (!ft||it.type===ft)&&(!q||norm(it.name).indexOf(q)>-1);});
+  $('itemsCount').textContent='('+fmt(list.length)+(list.length!==S.items.length?' من '+fmt(S.items.length):'')+')';
+  var shown=list.slice(0,LIMIT);
+  $('itemsList').innerHTML=shown.length?shown.map(function(it){
+    return '<div class="irow"><div class="i-main"><b>'+esc(it.name)+'</b><div class="chips">'+chips(it)+'</div></div>'+
+      '<div class="i-act"><button class="btn sm" data-act="editItem" data-id="'+it.id+'">تعديل</button>'+
+      '<button class="btn sm" data-act="delItem" data-id="'+it.id+'" data-confirm="تأكيد الحذف">حذف</button></div></div>';
+  }).join('')+(list.length>LIMIT?'<div class="cap-note">تم عرض أول '+LIMIT+' مادة. استخدم البحث لإظهار الباقي.</div>':''):'<div class="empty">'+(S.items.length?'لا توجد مواد مطابقة':'لا توجد مواد بعد. أضف مادة أو استورد ملف Excel.')+'</div>';
+}
+function saveItem(){
+  var name=$('fName').value.trim(),per=parseInt(toLatin($('fPer').value).replace(/\D/g,''),10),packed=$('fPackIn').value==='1',type=$('fTypeIn').value;
+  if(!name){toast('اكتب اسم المادة');$('fName').focus();return;}
+  if(!per||per<1){toast('اكتب عدد القطع في الكارتون (رقم أكبر من صفر)');$('fPer').focus();return;}
+  var k=keyOf(name,packed),dup=S.items.find(function(x){return keyOf(x.name,x.packed)===k&&x.id!==editId;});
+  if(dup){toast('المادة موجودة بنفس التغليف');return;}
+  if(editId){
+    var it=S.items.find(function(x){return x.id===editId;});
+    if(it){it.name=name;it.type=type;it.packed=packed;it.per=per;}
+    editId=null;toast('تم حفظ التعديل');
+  }else{
+    S.items.push({id:uid(),name:name,type:type,packed:packed,per:per});toast('تمت إضافة المادة');
+  }
+  $('fName').value='';$('fPer').value='';
+  persist();renderItemForm();renderItems();renderOrder();renderCounts();
+  $('fName').focus();
+}
+function removeItemEverywhere(id){
+  S.items=S.items.filter(function(x){return x.id!==id;});
+  Object.keys(S.drafts).forEach(function(w){delete S.drafts[w][id];});
+  Object.keys(S.stockDrafts).forEach(function(w){delete S.stockDrafts[w][id];});
+}
+
+/* ---------- excel import ---------- */
+var SYN={
+  name:['اسم المادة','المادة','الاسم','اسم الصنف','الصنف','اسم الايتم','الايتم','اسم','item','name','product','material'],
+  per:['عدد القطع في الكارتون','عدد القطع بالكارتون','القطع في الكارتون','قطع في الكارتون','قطع بالكارتون','حجم الكارتون','عدد القطع','القطع','العبوات','pcs','piece','per carton','carton size','كارتون'],
+  pack:['التغليف','مغلف','الحاله','حاله','packed','packaging','pack'],
+  type:['النوع','نوع','الشكل الدوائي','الشكل','type','form']
+};
+function autoMap(header){
+  var hn=header.map(norm),used={},res={};
+  ['name','per','pack','type'].forEach(function(f){
+    var idx=-1,syn=SYN[f].map(norm);
+    for(var i=0;i<hn.length&&idx<0;i++){if(!used[i]&&syn.indexOf(hn[i])>-1)idx=i;}
+    for(var j=0;j<hn.length&&idx<0;j++){if(!used[j]&&hn[j]&&syn.some(function(s){return hn[j].indexOf(s)>-1;}))idx=j;}
+    if(idx>-1)used[idx]=1;
+    res[f]=idx;
+  });
+  return res;
+}
+function normType(v){
+  var s=norm(v);if(!s)return '';
+  for(var i=0;i<TYPES.length;i++){if(s===norm(TYPES[i]))return TYPES[i];}
+  var m=[['حبوب',['حبوب','حبه','اقراص','قرص','كبسول','tab','cap','pill']],['شراب',['شراب','syr']],['كريم',['كريم','cream']],['مرهم',['مرهم','oint']],['معلق',['معلق','susp']],['قطرة',['قطره','قطرات','drop']],['معقم',['معقم','sanit','antisept','steril']]];
+  for(var k=0;k<m.length;k++){if(m[k][1].some(function(x){return s.indexOf(x)>-1;}))return m[k][0];}
+  return null;
+}
+function normPack(v){
+  var s=norm(v);if(!s)return '';
+  if(/^(لا|no|n|false|0)$/.test(s)||s.indexOf('غير')>-1||s.indexOf('بدون')>-1||s.indexOf('unpack')>-1||s.indexOf('non')>-1)return false;
+  if(/مغلف|نعم|yes|true|^1$|^y$|pack|علبه/.test(s))return true;
+  return null;
+}
+function colOptions(header,withNone){
+  return (withNone?'<option value="-1">— لا يوجد —</option>':'')+header.map(function(h,i){return '<option value="'+i+'">'+esc((i+1)+' · '+(String(h).trim()||'عمود '+(i+1)))+'</option>';}).join('');
+}
+async function onImportFile(file){
+  if(!file)return;
+  if(typeof XLSX==='undefined'){toast('تعذّر تحميل مكتبة Excel، تحقق من الاتصال');return;}
+  try{
+    var buf=await file.arrayBuffer();
+    var wb=XLSX.read(buf,{type:'array',codepage:65001});
+    var ws=wb.Sheets[wb.SheetNames[0]];
+    var rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',blankrows:false});
+    var hi=rows.findIndex(function(r){return r.filter(function(c){return String(c).trim()!=='';}).length>=2;});
+    if(hi<0){toast('لم أجد بيانات في الملف');return;}
+    var header=rows[hi].map(function(c){return String(c);});
+    imp={rows:rows.slice(hi+1),header:header};
+    var m=autoMap(header);
+    $('mapName').innerHTML=colOptions(header,false);$('mapPer').innerHTML=colOptions(header,false);
+    $('mapType').innerHTML=colOptions(header,true);$('mapPack').innerHTML=colOptions(header,true);
+    $('mapName').value=m.name>-1?m.name:0;
+    $('mapPer').value=m.per>-1?m.per:Math.min(1,header.length-1);
+    $('mapType').value=m.type;$('mapPack').value=m.pack;
+    $('impPanel').hidden=false;
+    analyze();
+  }catch(e){toast('تعذّرت قراءة الملف');}
+}
+function analyze(){
+  if(!imp)return null;
+  var m={name:+$('mapName').value,per:+$('mapPer').value,type:+$('mapType').value,pack:+$('mapPack').value};
+  var defT=$('defType').value,defP=$('defPack').value==='1';
+  var map=new Map(),bad=[];
+  imp.rows.forEach(function(r){
+    var name=String(r[m.name]==null?'':r[m.name]).trim();
+    if(!name){
+      if(r.some(function(c){return String(c).trim()!=='';}))bad.push('صف بدون اسم مادة');
+      return;
+    }
+    var type=defT;
+    if(m.type>-1){var t=normType(r[m.type]);if(t===null){bad.push('«'+name+'»: نوع غير معروف ('+String(r[m.type]).trim()+')');return;}if(t)type=t;}
+    var packed=defP;
+    if(m.pack>-1){var p=normPack(r[m.pack]);if(p===null){bad.push('«'+name+'»: قيمة التغليف غير واضحة ('+String(r[m.pack]).trim()+')');return;}if(p!=='')packed=p;}
+    var perRaw=toLatin(r[m.per]).replace(/[^\d.]/g,''),per=parseFloat(perRaw);
+    if(!per||per<1||Math.floor(per)!==per){bad.push('«'+name+'»: عدد القطع في الكارتون غير صالح');return;}
+    map.set(keyOf(name,packed),{name:name,type:type,packed:packed,per:per});
+  });
+  var exist={};S.items.forEach(function(x){exist[keyOf(x.name,x.packed)]=1;});
+  var valid=Array.from(map.values()),nw=0,up=0;
+  valid.forEach(function(v){if(exist[keyOf(v.name,v.packed)])up++;else nw++;});
+  $('impSummary').innerHTML='<span>جديدة: <b>'+fmt(nw)+'</b></span><span>تحديث: <b>'+fmt(up)+'</b></span><span>تحتاج مراجعة: <b>'+fmt(bad.length)+'</b></span>';
+  $('impBad').innerHTML=bad.slice(0,8).map(function(b){return '<li>'+esc(b)+'</li>';}).join('')+(bad.length>8?'<li>و '+fmt(bad.length-8)+' صفوف أخرى</li>':'');
+  $('impGo').disabled=!valid.length;
+  imp.valid=valid;imp.nw=nw;imp.up=up;
+  return imp;
+}
+function applyImport(){
+  if(!imp||!imp.valid||!imp.valid.length)return;
+  var byKey={};S.items.forEach(function(x){byKey[keyOf(x.name,x.packed)]=x;});
+  imp.valid.forEach(function(v){
+    var ex=byKey[keyOf(v.name,v.packed)];
+    if(ex){ex.type=v.type;ex.per=v.per;ex.name=v.name;}
+    else{var it={id:uid(),name:v.name,type:v.type,packed:v.packed,per:v.per};S.items.push(it);byKey[keyOf(v.name,v.packed)]=it;}
+  });
+  toast('تم الاستيراد: '+fmt(imp.nw)+' جديدة، '+fmt(imp.up)+' محدّثة');
+  resetImport();persist();renderItems();renderOrder();renderCounts();
+}
+function resetImport(){imp=null;$('impPanel').hidden=true;$('impFile').value='';}
+function downloadTemplate(){
+  if(typeof XLSX==='undefined'){toast('تعذّر تحميل مكتبة Excel، تحقق من الاتصال');return;}
+  var ws=XLSX.utils.aoa_to_sheet([['اسم المادة','النوع','التغليف','عدد القطع في الكارتون']]);
+  ws['!cols']=[{wch:34},{wch:12},{wch:12},{wch:22}];
+  var ws2=XLSX.utils.aoa_to_sheet([['الحقل','القيم المقبولة'],['النوع',TYPES.join('، ')],['التغليف','مغلف أو غير مغلف'],['عدد القطع في الكارتون','رقم صحيح أكبر من صفر']]);
+  ws2['!cols']=[{wch:24},{wch:50}];
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'المواد');XLSX.utils.book_append_sheet(wb,ws2,'تعليمات');
+  wb.Workbook={Views:[{RTL:true}]};
+  saveFile('نموذج-المواد.xlsx',XLSX.write(wb,{bookType:'xlsx',type:'array'}),'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+}
+
+/* ---------- saved orders ---------- */
+function renderSaved(){
+  var box=$('savedList');
+  if(!S.saved.length){box.innerHTML='<div class="empty">لا توجد طلبيات محفوظة. اضغط «حفظ الطلبية» في قسم الطلبية.</div>';return;}
+  box.innerHTML=S.saved.map(function(o){
+    var t=totalsOf(o.lines);
+    return '<div class="srow"><div class="i-main"><b>'+esc(o.whName)+'</b><span class="note">'+esc(fmtDate(o.ts))+'</span>'+
+      '<div class="sum-line"><span>كراتين: <b>'+fmt(t.ctn)+'</b></span><span>قطع: <b>'+fmt(t.qty)+'</b></span><span>مواد: <b>'+fmt(t.count)+'</b></span></div></div>'+
+      '<div class="i-act" style="flex-wrap:wrap">'+
+      '<button class="btn sm" data-act="openSaved" data-id="'+o.id+'" data-confirm="سيستبدل كميات هذا المذخر، اضغط للتأكيد">فتح</button>'+
+      '<button class="btn sm" data-act="copySaved" data-id="'+o.id+'">واتساب</button>'+
+      '<button class="btn sm" data-act="xlsxSaved" data-id="'+o.id+'">Excel</button>'+
+      '<button class="btn sm" data-act="delSaved" data-id="'+o.id+'" data-confirm="تأكيد الحذف">حذف</button></div></div>';
+  }).join('');
+}
+function openSaved(id){
+  var o=S.saved.find(function(x){return x.id===id;});if(!o)return;
+  var w=S.warehouses.find(function(x){return x.id===o.whId;})||S.warehouses.find(function(x){return norm(x.name)===norm(o.whName);});
+  if(!w){w={id:uid(),name:o.whName};S.warehouses.push(w);}
+  S.currentWh=w.id;
+  var byKey={};S.items.forEach(function(x){byKey[keyOf(x.name,x.packed)]=x;});
+  var d={},miss=0;
+  o.lines.forEach(function(l){var it=byKey[keyOf(l.name,l.packed)];if(it)d[it.id]=l.qty;else miss++;});
+  S.drafts[w.id]=d;persist();
+  renderWh();renderOrder();setView('order');
+  toast(miss?'تم الفتح، وتعذّر إيجاد '+miss+' مادة في قائمة المواد':'تم فتح الطلبية');
+}
+
+/* ---------- views ---------- */
+function renderCounts(){
+  $('cItems').textContent=S.items.length?'('+fmt(S.items.length)+')':'';
+  $('cSaved').textContent=S.saved.length?'('+fmt(S.saved.length)+')':'';
+}
+function setView(v){
+  if(['order','stock','items','saved'].indexOf(v)<0)v='order';
+  view=v;
+  ['order','stock','items','saved'].forEach(function(n){
+    $('view-'+n).hidden=n!==v;
+    $('tab-'+n).setAttribute('aria-selected',n===v?'true':'false');
+  });
+  if(location.hash!=='#'+v)location.hash=v;
+  if(v==='items')renderItems();
+  if(v==='saved')renderSaved();
+  if(v==='stock')renderStock();
+  window.scrollTo(0,0);
+}
+
+/* ---------- actions ---------- */
+var ACTS={
+  tab:function(id){setView(id);},
+  addWh:function(){if(view!=='order')setView('order');openWhEdit('add');},
+  renameWh:function(){openWhEdit('rename');},
+  cancelWh:function(){whMode=null;renderWh();},
+  saveWh:function(){
+    var name=$('whName').value.trim();
+    if(!name){toast('اكتب اسم المذخر');return;}
+    var dup=S.warehouses.find(function(w){return norm(w.name)===norm(name)&&!(whMode==='rename'&&w.id===S.currentWh);});
+    if(dup){toast('هذا المذخر موجود');return;}
+    if(whMode==='rename'){var w=S.warehouses.find(function(x){return x.id===S.currentWh;});if(w)w.name=name;}
+    else{var nw={id:uid(),name:name};S.warehouses.push(nw);S.currentWh=nw.id;}
+    whMode=null;persist();renderWh();renderOrder();toast('تم حفظ المذخر');
+  },
+  delWh:function(){
+    S.warehouses=S.warehouses.filter(function(w){return w.id!==S.currentWh;});
+    delete S.drafts[S.currentWh];delete S.stockDrafts[S.currentWh];S.currentWh=null;
+    persist();renderWh();renderOrder();toast('تم حذف المذخر');
+  },
+  clearDraft:function(){if(S.currentWh){S.drafts[S.currentWh]={};persist();renderOrder();toast('تم تفريغ الكميات');}},
+  saveOrder:function(){
+    var lines=curLines();if(!lines.length){toast('الطلبية فارغة');return;}
+    S.saved.unshift({id:uid(),whId:S.currentWh,whName:whName(),ts:Date.now(),lines:lines});
+    persist();renderCounts();toast('تم حفظ الطلبية في قائمة المحفوظة');
+  },
+  copyWa:function(){var l=curLines();if(!l.length){toast('الطلبية فارغة');return;}copyText(waText({whName:whName(),ts:Date.now()},l));},
+  xlsxOrder:function(){exportOrder({whName:whName(),ts:Date.now()},curLines());},
+  closeCopy:function(){$('copyModal').hidden=true;},
+  saveItem:saveItem,
+  cancelEdit:function(){editId=null;$('fName').value='';$('fPer').value='';renderItemForm();},
+  editItem:function(id){editId=id;renderItemForm();$('fName').scrollIntoView({block:'center'});$('fName').focus();},
+  delItem:function(id){removeItemEverywhere(id);if(editId===id)editId=null;persist();renderItemForm();renderItems();renderOrder();renderCounts();toast('تم حذف المادة');},
+  delAllItems:function(){S.items=[];S.drafts={};S.stockDrafts={};editId=null;persist();renderItemForm();renderItems();renderOrder();renderCounts();toast('تم حذف كل المواد');},
+  importGo:applyImport,
+  importCancel:resetImport,
+  tmpl:downloadTemplate,
+  bkExport:function(){saveFile('نسخة-طلبيات-دجلة-'+dayStr()+'.json',JSON.stringify(S,null,1),'application/json');},
+  restoreGo:function(){
+    var o=pendingRestore;if(!o)return;
+    S.items=o.items;S.warehouses=o.warehouses;S.currentWh=o.currentWh;S.drafts=o.drafts;S.saved=o.saved;S.counts=o.counts;S.stockDrafts=o.stockDrafts;reportId=null;
+    pendingRestore=null;$('restorePanel').hidden=true;$('bkFile').value='';editId=null;whMode=null;
+    persist();renderWh();renderOrder();renderItemForm();renderItems();renderCounts();toast('تمت الاستعادة');
+  },
+  restoreCancel:function(){pendingRestore=null;$('restorePanel').hidden=true;$('bkFile').value='';},
+  openSaved:openSaved,
+  copySaved:function(id){var o=S.saved.find(function(x){return x.id===id;});if(o)copyText(waText(o,o.lines));},
+  xlsxSaved:function(id){var o=S.saved.find(function(x){return x.id===id;});if(o)exportOrder(o,o.lines);},
+  delSaved:function(id){S.saved=S.saved.filter(function(x){return x.id!==id;});persist();renderSaved();renderCounts();toast('تم حذف الطلبية');},
+  saveCount:function(){
+    var w=S.warehouses.find(function(x){return x.id===S.currentWh;});if(!w)return;
+    var d=S.stockDrafts[w.id]||{},ctx=stockCtx(),lines=[];
+    S.items.forEach(function(it){
+      var e=d[it.id];if(!e)return;
+      var k=keyOf(it.name,it.packed),lf=ctx.lastFor[k],prev=lf?lf.rem:0,bought=ctx.bought[k]||0,rem=remOf(it,e);
+      lines.push({name:it.name,type:it.type,packed:!!it.packed,per:it.per,prev:prev,bought:bought,rem:rem,sold:prev+bought-rem,first:!lf});
+    });
+    if(!lines.length){toast('أدخل الباقي لمادة واحدة على الأقل');return;}
+    sortLines(lines);
+    var c={id:uid(),whId:w.id,whName:w.name,ts:Date.now(),lines:lines};
+    S.counts.unshift(c);delete S.stockDrafts[w.id];reportId=c.id;
+    persist();renderStock();toast('تم حفظ الجرد وحساب المصروف');
+    $('repCard').scrollIntoView({block:'start'});
+  },
+  clearStock:function(){delete S.stockDrafts[S.currentWh];persist();renderStock();toast('تم تفريغ الحقول');},
+  showCount:function(id){reportId=id;renderReport();$('repCard').scrollIntoView({block:'start'});},
+  delCount:function(id){S.counts=S.counts.filter(function(x){return x.id!==id;});if(reportId===id)reportId=null;persist();renderStock();toast('تم حذف الجرد');},
+  fillFromCount:function(id){
+    var c=S.counts.find(function(x){return x.id===id;});if(!c)return;
+    var w=resolveWh(c);S.currentWh=w.id;
+    var byKey={};S.items.forEach(function(x){byKey[keyOf(x.name,x.packed)]=x;});
+    var d={},n=0;
+    c.lines.forEach(function(l){var it=byKey[keyOf(l.name,l.packed)];if(l.sold>0&&it){d[it.id]=l.sold;n++;}});
+    S.drafts[w.id]=d;persist();renderWh();renderOrder();setView('order');
+    toast(n?'تمت تعبئة '+fmt(n)+' مادة بالمصروف':'لا توجد مواد مصروفة لتعبئتها');
+  },
+  xlsxCount:function(id){var c=S.counts.find(function(x){return x.id===id;});if(c)exportCount(c);},
+  install:function(){
+    if(!deferredInstall)return;
+    deferredInstall.prompt();
+    deferredInstall.userChoice.then(function(){deferredInstall=null;$('installBtn').hidden=true;},function(){});
+  }
+};
+function arm(t){t.dataset.armed='1';t.dataset.orig=t.textContent;t.textContent=t.dataset.confirm;t.classList.add('armed');clearTimeout(t._t);t._t=setTimeout(function(){disarm(t);},4000);}
+function disarm(t){if(t.dataset.armed==='1'){t.dataset.armed='0';t.textContent=t.dataset.orig;t.classList.remove('armed');}clearTimeout(t._t);}
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-act]');if(!t)return;
+  if(t.dataset.confirm&&t.dataset.armed!=='1'){arm(t);return;}
+  disarm(t);
+  var fn=ACTS[t.dataset.act];if(fn)fn(t.dataset.id,t);
+});
+document.addEventListener('input',function(e){
+  var t=e.target;
+  if(t.classList&&t.classList.contains('qty'))onQtyInput(t);
+  else if(t.classList&&t.classList.contains('sin'))onStockInput(t);
+});
+document.addEventListener('keydown',function(e){
+  var t=e.target;
+  if(e.key==='Enter'&&t.classList&&t.classList.contains('sin')){
+    e.preventDefault();
+    var alls=Array.prototype.slice.call(document.querySelectorAll('#stLines .sin')),j=alls.indexOf(t);
+    if(alls[j+1]){alls[j+1].focus();alls[j+1].select();}else t.blur();
+  }else if(e.key==='Enter'&&t.classList&&t.classList.contains('qty')){
+    e.preventDefault();
+    var all=Array.prototype.slice.call(document.querySelectorAll('#lines .qty')),i=all.indexOf(t);
+    if(all[i+1]){all[i+1].focus();all[i+1].select();}else t.blur();
+  }else if(e.key==='Enter'&&t.id==='whName'){ACTS.saveWh();}
+  else if(e.key==='Enter'&&(t.id==='fName'||t.id==='fPer')){saveItem();}
+});
+
+/* ---------- init ---------- */
+function init(){
+  load();
+  $('fType').innerHTML=typeOptions(true);$('fType2').innerHTML=typeOptions(true);
+  $('fTypeIn').innerHTML=typeOptions(false);$('defType').innerHTML=typeOptions(false);
+  ['whSel','stWh'].forEach(function(id){
+    $(id).addEventListener('change',function(){S.currentWh=this.value||null;persist();renderWh();renderOrder();if(view==='stock')renderStock();});
+  });
+  ['q3','showAllStock'].forEach(function(id){$(id).addEventListener('input',renderStock);});
+  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredInstall=e;$('installBtn').hidden=false;});
+  window.addEventListener('appinstalled',function(){deferredInstall=null;$('installBtn').hidden=true;});
+  ['q','fType','fPack','onlyOrdered'].forEach(function(id){$(id).addEventListener('input',renderOrder);});
+  ['q2','fType2'].forEach(function(id){$(id).addEventListener('input',renderItems);});
+  ['mapName','mapPer','mapType','mapPack','defType','defPack'].forEach(function(id){$(id).addEventListener('change',analyze);});
+  $('impFile').addEventListener('change',function(){onImportFile(this.files[0]);});
+  $('bkFile').addEventListener('change',async function(){
+    var f=this.files[0];if(!f)return;
+    try{
+      var o=JSON.parse(await f.text());
+      if(!o||!Array.isArray(o.items)||!Array.isArray(o.warehouses))throw new Error('bad');
+      pendingRestore={items:o.items,warehouses:o.warehouses,currentWh:o.currentWh||null,drafts:(o.drafts&&typeof o.drafts==='object')?o.drafts:{},saved:Array.isArray(o.saved)?o.saved:[],counts:Array.isArray(o.counts)?o.counts:[],stockDrafts:(o.stockDrafts&&typeof o.stockDrafts==='object')?o.stockDrafts:{}};
+      $('restoreInfo').textContent='النسخة تحتوي على '+fmt(o.items.length)+' مادة و '+fmt(o.warehouses.length)+' مذخر و '+fmt(pendingRestore.saved.length)+' طلبية محفوظة و '+fmt(pendingRestore.counts.length)+' جرد.';
+      $('restorePanel').hidden=false;
+    }catch(e){toast('الملف ليس نسخة احتياطية صالحة');this.value='';}
+  });
+  window.addEventListener('hashchange',function(){setView(location.hash.slice(1)||'order');});
+  renderWh();renderOrder();renderItemForm();renderCounts();
+  setView(location.hash.slice(1)||'order');
+  if(!S.warehouses.length&&view==='order')openWhEdit('add');
+  try{if(window.claude&&window.claude.use){window.claude.use('downloads').then(function(d){dl=d||null;},function(){dl=null;});}}catch(e){dl=null;}
+}
+init();
+})();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.indexOf('http')===0){
+  window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});
+}
+</script>
+</body>
+</html>
